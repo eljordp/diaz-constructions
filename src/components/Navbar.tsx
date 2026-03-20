@@ -50,7 +50,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center shrink-0">
               <img
-                src="https://diazconstructions.com/logo-outline.webp"
+                src="/logo.webp"
                 alt="Diaz Construction"
                 className="h-12"
               />

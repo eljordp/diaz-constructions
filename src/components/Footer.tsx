@@ -40,7 +40,7 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-block mb-5">
               <img
-                src="https://diazconstructions.com/logo-outline.webp"
+                src="/logo.webp"
                 alt="Diaz Construction"
                 className="h-12"
               />
