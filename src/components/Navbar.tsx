@@ -82,7 +82,7 @@ export default function Navbar() {
               {/* Hamburger */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="lg:hidden p-2 text-white/60 hover:text-white transition-colors"
+                className="lg:hidden p-2 -m-1 min-w-[44px] min-h-[44px] flex items-center justify-center text-white/60 hover:text-white transition-colors"
                 aria-label="Toggle menu"
               >
                 {mobileOpen ? (

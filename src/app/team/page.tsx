@@ -40,7 +40,7 @@ export default function TeamPage() {
           <p className="text-accent text-sm font-semibold tracking-widest uppercase mb-4">
             The People Behind the Work
           </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white tracking-tight">
             Meet Our Team
           </h1>
           <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto">

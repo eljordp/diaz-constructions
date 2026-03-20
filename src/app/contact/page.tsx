@@ -79,7 +79,7 @@ export default function ContactPage() {
           <p className="text-accent text-sm font-semibold tracking-widest uppercase mb-4">
             Let&apos;s Build Together
           </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white tracking-tight">
             Get a Free Quote
           </h1>
           <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto">

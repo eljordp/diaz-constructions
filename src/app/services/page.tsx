@@ -58,7 +58,7 @@ export default function ServicesPage() {
       {/* Hero Header */}
       <section className="bg-navy-950 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
             Our Services
           </h1>
           <p className="mt-4 text-lg text-white/50 max-w-2xl mx-auto">
@@ -71,7 +71,7 @@ export default function ServicesPage() {
       {/* Services Grid */}
       <section className="bg-slate-light py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {services.map((service) => (
               <div
                 key={service.title}
@@ -95,7 +95,7 @@ export default function ServicesPage() {
                 {/* CTA Link */}
                 <Link
                   href={`/services/${service.slug}`}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent-dark transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent-dark transition-colors min-h-[44px]"
                 >
                   Learn More
                   <svg
@@ -130,7 +130,7 @@ export default function ServicesPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-3.5 rounded transition-colors text-sm tracking-wide uppercase"
+            className="inline-block w-full sm:w-auto bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-4 rounded transition-colors text-sm tracking-wide uppercase text-center"
           >
             Get a Free Consultation
           </Link>

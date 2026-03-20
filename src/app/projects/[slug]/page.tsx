@@ -176,7 +176,7 @@ export default async function ProjectPage({
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[50vh] w-full">
+      <section className="relative h-[30vh] sm:h-[50vh] w-full">
         <img
           src={project.images[0]}
           alt={project.name}
@@ -188,7 +188,7 @@ export default async function ProjectPage({
             <span className="inline-block bg-accent text-navy-950 text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
               {project.city}
             </span>
-            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl text-white leading-tight">
+            <h1 className="font-display text-2xl sm:text-3xl lg:text-5xl text-white leading-tight">
               {project.name}
             </h1>
           </div>
@@ -198,7 +198,7 @@ export default async function ProjectPage({
       {/* Project Info Bar */}
       <section className="bg-navy-900 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-y-2 divide-x divide-white/15 py-4 text-sm text-white/70">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-y-3 sm:gap-y-2 sm:divide-x sm:divide-white/15 py-4 text-sm text-white/70">
             <div className="px-5 text-center">
               <span className="block text-[10px] uppercase tracking-widest text-white/40 mb-0.5">Category</span>
               <span className="font-medium text-white/90">{project.category}</span>
@@ -280,7 +280,7 @@ export default async function ProjectPage({
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-3.5 rounded transition-colors text-sm tracking-wide uppercase"
+            className="inline-block w-full sm:w-auto bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-4 rounded transition-colors text-sm tracking-wide uppercase text-center"
           >
             Get a Free Estimate
           </Link>
@@ -292,7 +292,7 @@ export default async function ProjectPage({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 text-sm font-medium text-navy-800/60 hover:text-accent transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-medium text-navy-800/60 hover:text-accent transition-colors min-h-[44px]"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />

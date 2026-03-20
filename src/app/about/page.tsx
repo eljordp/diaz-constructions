@@ -16,7 +16,7 @@ export default function AboutPage() {
           <p className="text-accent text-sm font-semibold tracking-widest uppercase mb-4">
             Our Story
           </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white tracking-tight">
             About Diaz Construction
           </h1>
           <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto">
@@ -79,7 +79,7 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {[
               {
                 title: "Quality Craftsmanship",
@@ -153,7 +153,7 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
                 stat: "CSLB #989528",
@@ -181,7 +181,7 @@ export default function AboutPage() {
               },
             ].map((item) => (
               <div key={item.label} className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-navy-950 mb-2">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-navy-950 mb-2">
                   {item.stat}
                 </div>
                 <div className="text-sm font-semibold text-accent uppercase tracking-wider mb-3">

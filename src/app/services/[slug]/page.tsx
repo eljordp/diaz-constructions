@@ -195,7 +195,7 @@ export default async function ServiceDetailPage({
           <p className="text-accent text-sm font-semibold uppercase tracking-widest mb-4">
             Our Services
           </p>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-white leading-tight">
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-6xl text-white leading-tight">
             {service.headline}
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
@@ -204,13 +204,13 @@ export default async function ServiceDetailPage({
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-block bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-3.5 rounded transition-colors text-sm tracking-wide uppercase"
+              className="inline-block w-full sm:w-auto bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-4 rounded transition-colors text-sm tracking-wide uppercase text-center"
             >
               Get a Free Quote
             </Link>
             <a
               href="tel:6504549122"
-              className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors text-sm"
+              className="inline-flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors text-sm min-h-[44px]"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
@@ -291,13 +291,13 @@ export default async function ServiceDetailPage({
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-block bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-3.5 rounded transition-colors text-sm tracking-wide uppercase"
+              className="inline-block w-full sm:w-auto bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-4 rounded transition-colors text-sm tracking-wide uppercase text-center"
             >
               Request a Quote
             </Link>
             <a
               href="tel:6504549122"
-              className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors font-medium"
+              className="inline-flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors font-medium min-h-[44px]"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />

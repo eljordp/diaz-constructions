@@ -104,7 +104,7 @@ export default function ProjectsPage() {
       {/* Hero Header */}
       <section className="bg-navy-950 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
             Our Projects
           </h1>
           <p className="mt-4 text-lg text-white/50 max-w-2xl mx-auto">
@@ -123,7 +123,7 @@ export default function ProjectsPage() {
               <button
                 key={cat}
                 onClick={() => setActiveFilter(cat)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`px-5 py-2.5 min-h-[44px] rounded-full text-sm font-medium transition-colors ${
                   activeFilter === cat
                     ? 'bg-navy-950 text-white'
                     : 'bg-white text-navy-800/70 hover:bg-navy-950/10 border border-navy-950/10'
@@ -135,7 +135,7 @@ export default function ProjectsPage() {
           </div>
 
           {/* Project Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filtered.map((project) => {
               return (
                 <Link
@@ -188,7 +188,7 @@ export default function ProjectsPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-3.5 rounded transition-colors text-sm tracking-wide uppercase"
+            className="inline-block w-full sm:w-auto bg-accent hover:bg-accent-dark text-navy-950 font-semibold px-8 py-4 rounded transition-colors text-sm tracking-wide uppercase text-center"
           >
             Get a Free Estimate
           </Link>

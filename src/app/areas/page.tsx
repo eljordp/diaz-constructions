@@ -28,7 +28,7 @@ export default function AreasPage() {
           <p className="text-accent text-sm font-semibold tracking-widest uppercase mb-4">
             Service Areas
           </p>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight">
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-6xl text-white tracking-tight">
             Areas We Serve
           </h1>
           <p className="mt-6 text-lg text-white/50 max-w-2xl mx-auto">

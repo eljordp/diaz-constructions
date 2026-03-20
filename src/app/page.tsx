@@ -190,11 +190,11 @@ export default function Home() {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-navy-950/80 via-navy-900/60 to-transparent" />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-24 md:py-32">
           <p className="text-accent font-medium tracking-widest uppercase text-sm mb-6">
             Licensed General Contractor &middot; CSLB #989528
           </p>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-4xl">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-4xl">
             Your Trusted General Contractor in Redwood City{" "}
             <span className="text-accent">&amp; the Bay Area</span>
           </h1>
@@ -222,7 +222,7 @@ export default function Home() {
 
       {/* ════════════ SERVICES ════════════ */}
       <section className="py-20 md:py-28 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <p className="text-accent font-medium tracking-widest uppercase text-sm mb-3">
               What We Do
@@ -232,7 +232,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {services.map((service) => (
               <div
                 key={service.title}
@@ -247,7 +247,7 @@ export default function Home() {
                 </p>
                 <Link
                   href="/services"
-                  className="text-accent font-medium hover:text-accent-dark transition-colors inline-flex items-center gap-1"
+                  className="text-accent font-medium hover:text-accent-dark transition-colors inline-flex items-center gap-1 min-h-[44px]"
                 >
                   Learn More
                   <span aria-hidden="true">&rarr;</span>
@@ -260,7 +260,7 @@ export default function Home() {
 
       {/* ════════════ WHY CHOOSE US ════════════ */}
       <section className="py-20 md:py-28 bg-slate-light">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <p className="text-accent font-medium tracking-widest uppercase text-sm mb-3">
               Why Diaz Construction
@@ -270,7 +270,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {[
               {
                 icon: <IconShield />,
@@ -311,8 +311,8 @@ export default function Home() {
 
       {/* ════════════ STATS ════════════ */}
       <section className="py-20 md:py-24 bg-navy-950">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 text-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10 text-center">
             {[
               { number: "500+", label: "Projects Completed" },
               { number: "15+", label: "Years in Business" },
@@ -320,7 +320,7 @@ export default function Home() {
               { number: "Bay Area", label: "Born & Raised" },
             ].map((stat) => (
               <div key={stat.label}>
-                <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent mb-2">
+                <p className="text-2xl sm:text-3xl lg:text-5xl font-bold text-accent mb-2">
                   {stat.number}
                 </p>
                 <p className="text-gray-400 text-sm sm:text-base uppercase tracking-wider">
@@ -334,7 +334,7 @@ export default function Home() {
 
       {/* ════════════ SERVICE AREA ════════════ */}
       <section className="py-20 md:py-28 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <p className="text-accent font-medium tracking-widest uppercase text-sm mb-3">
               Where We Work
@@ -348,11 +348,11 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
             {serviceAreas.map((city) => (
               <div
                 key={city}
-                className="flex items-center justify-center gap-2 py-4 px-3 bg-slate-light rounded-lg text-navy-950 font-medium"
+                className="flex items-center justify-center gap-2 py-3 sm:py-4 px-2 sm:px-3 bg-slate-light rounded-lg text-navy-950 text-sm sm:text-base font-medium"
               >
                 <svg className="w-4 h-4 text-accent shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
@@ -376,7 +376,7 @@ export default function Home() {
 
       {/* ════════════ TESTIMONIALS ════════════ */}
       <section className="py-20 md:py-28 bg-slate-light">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <p className="text-accent font-medium tracking-widest uppercase text-sm mb-3">
               Testimonials
@@ -386,7 +386,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {testimonials.map((t) => (
               <div
                 key={t.name}
@@ -417,7 +417,7 @@ export default function Home() {
 
       {/* ════════════ CTA ════════════ */}
       <section className="py-20 md:py-28 bg-navy-950">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Start Your Project?
           </h2>
@@ -428,7 +428,7 @@ export default function Home() {
           <p className="mb-10">
             <a
               href="tel:6504549122"
-              className="text-accent text-2xl sm:text-3xl font-bold hover:text-accent-light transition-colors"
+              className="text-accent text-xl sm:text-2xl md:text-3xl font-bold hover:text-accent-light transition-colors"
             >
               (650) 454-9122
             </a>
