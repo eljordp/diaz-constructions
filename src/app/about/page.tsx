@@ -28,31 +28,40 @@ export default function AboutPage() {
       {/* Company Story */}
       <section className="py-20 sm:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold text-navy-950 tracking-tight">
-              From Humble Beginnings to Bay Area Trusted
-            </h2>
-            <div className="mt-8 space-y-6 text-navy-950/70 text-lg leading-relaxed">
-              <p>
-                Diaz Construction was founded in 2009 by Edgar Diaz with a simple
-                belief: do honest work, deliver quality results, and treat every
-                client like family. What started as a small operation has grown
-                into one of the Bay Area&apos;s most trusted general contracting
-                firms — built entirely through quality work and word of mouth.
-              </p>
-              <p>
-                For over 15 years, we&apos;ve served homeowners and property owners
-                across Redwood City, Hayward, and the greater Bay Area. From
-                kitchen remodels and bathroom renovations to ADUs, home additions,
-                and new construction, we bring the same level of care and
-                precision to every project — no matter the size.
-              </p>
-              <p>
-                As a family-owned business, we understand what it means to invest
-                in your home. That&apos;s why we treat every project as if it were
-                our own. We&apos;re fully licensed, bonded, and insured — giving
-                you the peace of mind you deserve.
-              </p>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-navy-950 tracking-tight">
+                From Humble Beginnings to Bay Area Trusted
+              </h2>
+              <div className="mt-8 space-y-6 text-navy-950/70 text-lg leading-relaxed">
+                <p>
+                  Diaz Construction was founded in 2009 by Edgar Diaz with a simple
+                  belief: do honest work, deliver quality results, and treat every
+                  client like family. What started as a small operation has grown
+                  into one of the Bay Area&apos;s most trusted general contracting
+                  firms — built entirely through quality work and word of mouth.
+                </p>
+                <p>
+                  For over 15 years, we&apos;ve served homeowners and property owners
+                  across Redwood City, Hayward, and the greater Bay Area. From
+                  kitchen remodels and bathroom renovations to ADUs, home additions,
+                  and new construction, we bring the same level of care and
+                  precision to every project — no matter the size.
+                </p>
+                <p>
+                  As a family-owned business, we understand what it means to invest
+                  in your home. That&apos;s why we treat every project as if it were
+                  our own. We&apos;re fully licensed, bonded, and insured — giving
+                  you the peace of mind you deserve.
+                </p>
+              </div>
+            </div>
+            <div>
+              <img
+                src="https://diazconstructions.com/projects/Sin%20Ubicacion/Bathroom/diaz-project1.1.webp"
+                alt="Diaz Construction bathroom project showcasing quality craftsmanship"
+                className="w-full rounded-xl object-cover shadow-lg"
+              />
             </div>
           </div>
         </div>

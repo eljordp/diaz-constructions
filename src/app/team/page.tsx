@@ -10,21 +10,21 @@ export const metadata: Metadata = {
 const teamMembers = [
   {
     name: "Edgar Diaz",
-    initials: "ED",
+    photo: "https://diazconstructions.com/edgar-profile.webp",
     title: "Owner & General Contractor",
     description:
       "Founded Diaz Construction in 2009 with a commitment to quality craftsmanship and honest work. Edgar oversees every project personally to ensure it meets the highest standards.",
   },
   {
     name: "Antonio Garcia",
-    initials: "AG",
+    photo: "https://diazconstructions.com/diaz-team1.webp",
     title: "Foreman",
     description:
       "Antonio brings expertise and leadership to every job site. His attention to detail and hands-on approach ensure projects run smoothly from start to finish.",
   },
   {
     name: "Gustavo Arreola",
-    initials: "GA",
+    photo: "https://diazconstructions.com/diaz-team2.webp",
     title: "Foreman",
     description:
       "With over 20 years of construction experience, Gustavo is a master of his craft. His deep knowledge of building techniques and materials is invaluable to every project.",
@@ -59,12 +59,11 @@ export default function TeamPage() {
                 key={member.name}
                 className="bg-slate-light rounded-xl p-8 sm:p-10 text-center border border-navy-950/5"
               >
-                {/* Photo Placeholder */}
-                <div className="w-28 h-28 rounded-full bg-navy-900 flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-accent tracking-wider">
-                    {member.initials}
-                  </span>
-                </div>
+                <img
+                  src={member.photo}
+                  alt={member.name}
+                  className="w-36 h-36 rounded-full object-cover mx-auto mb-6"
+                />
 
                 <h3 className="text-xl font-bold text-navy-950">
                   {member.name}

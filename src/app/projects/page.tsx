@@ -10,6 +10,7 @@ interface Project {
   category: Exclude<Category, 'All'>;
   city: string;
   description: string;
+  image: string;
 }
 
 const projects: Project[] = [
@@ -19,6 +20,7 @@ const projects: Project[] = [
     city: 'Redwood City',
     description:
       'Complete master bathroom transformation with custom tile and modern fixtures.',
+    image: 'https://diazconstructions.com/projects/Sin%20Ubicacion/Bathroom/portada.webp',
   },
   {
     name: "Herme's Full Remodel",
@@ -26,6 +28,7 @@ const projects: Project[] = [
     city: 'Menlo Park',
     description:
       'Whole-home remodel including kitchen, bathrooms, and flooring.',
+    image: 'https://diazconstructions.com/projects/Sin%20Ubicacion/Closet/portada.webp',
   },
   {
     name: "Phil's ADU",
@@ -33,6 +36,7 @@ const projects: Project[] = [
     city: 'Hayward',
     description:
       '600 sq ft detached ADU with full kitchen and bathroom.',
+    image: 'https://diazconstructions.com/projects/Sin%20Ubicacion/Kitchen/portada.webp',
   },
   {
     name: "Ben's Master Bedroom",
@@ -40,6 +44,7 @@ const projects: Project[] = [
     city: 'San Mateo',
     description:
       'Master bedroom addition with walk-in closet and en-suite bath.',
+    image: 'https://diazconstructions.com/projects/Sin%20Ubicacion/Wood%20room/diaz-project8.1.webp',
   },
   {
     name: 'Martinez Kitchen',
@@ -47,6 +52,7 @@ const projects: Project[] = [
     city: 'Fremont',
     description:
       'Modern kitchen with quartz countertops and custom island.',
+    image: 'https://diazconstructions.com/projects/LOS%20GATOS/Kitchen/diaz-kitchen2.webp',
   },
   {
     name: 'Sunset Patio',
@@ -54,6 +60,7 @@ const projects: Project[] = [
     city: 'Redwood City',
     description:
       '800 sq ft paver patio with built-in fire pit.',
+    image: 'https://diazconstructions.com/projects/BOCCE%20COURT/Bocce%20court/diaz-bocce8.webp',
   },
   {
     name: 'Oak Street ADU',
@@ -61,6 +68,7 @@ const projects: Project[] = [
     city: 'Union City',
     description:
       '450 sq ft studio ADU for rental income.',
+    image: 'https://diazconstructions.com/projects/Garage/adu-interior.webp',
   },
   {
     name: 'Rivera Home Addition',
@@ -68,21 +76,11 @@ const projects: Project[] = [
     city: 'Palo Alto',
     description:
       'Two-story addition with 3 bedrooms.',
+    image: 'https://diazconstructions.com/projects/CLEVELAND/diaz-cleveland.webp',
   },
 ];
 
 const categories: Category[] = ['All', 'Kitchen & Bath', 'ADU', 'Additions', 'Hardscape'];
-
-const gradients = [
-  'from-navy-950 to-navy-700',
-  'from-navy-900 via-navy-800 to-accent/30',
-  'from-navy-800 to-navy-950',
-  'from-navy-950 via-accent/20 to-navy-900',
-  'from-navy-700 to-navy-950',
-  'from-navy-900 to-accent/25',
-  'from-navy-950 to-navy-800',
-  'from-accent/20 via-navy-900 to-navy-950',
-];
 
 export default function ProjectsPage() {
   const [activeFilter, setActiveFilter] = useState<Category>('All');
@@ -130,19 +128,18 @@ export default function ProjectsPage() {
           {/* Project Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filtered.map((project) => {
-              const idx = projects.indexOf(project);
               return (
                 <div
                   key={project.name}
                   className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-navy-950/5 group"
                 >
-                  {/* Placeholder Image */}
-                  <div
-                    className={`relative aspect-[4/3] bg-gradient-to-br ${gradients[idx % gradients.length]} flex items-end p-5`}
-                  >
-                    <span className="text-white/90 font-semibold text-lg leading-snug drop-shadow-md">
-                      {project.name}
-                    </span>
+                  {/* Project Image */}
+                  <div className="relative h-56 w-full overflow-hidden">
+                    <img
+                      src={project.image}
+                      alt={project.name}
+                      className="h-full w-full object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
 
                   {/* Card Body */}

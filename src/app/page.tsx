@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /* ───────────────────────── SVG Icon Components ───────────────────────── */
@@ -137,20 +138,23 @@ const testimonials = [
   {
     quote:
       "Edgar and his team completely transformed our kitchen. Professional, on-time, and the quality exceeded our expectations.",
-    name: "Jennifer M.",
+    name: "Rebecca S.",
     location: "Redwood City",
+    image: "https://diazconstructions.com/1.%20Rebecca%20S.%20Diaz%20construction%20Reviews.webp",
   },
   {
     quote:
       "We hired Diaz Construction for our ADU project. They handled permits, construction, everything. Couldn't be happier.",
-    name: "Phil R.",
+    name: "Peter Lewis",
     location: "Hayward",
+    image: "https://diazconstructions.com/2.%20Peter%20Lewis%20Diaz%20construction%20Reviews.webp",
   },
   {
     quote:
       "Responsive, honest, and incredible craftsmanship. They made our bathroom remodel stress-free.",
-    name: "Sarah T.",
+    name: "Devz P.",
     location: "Menlo Park",
+    image: "https://diazconstructions.com/3.%20Devz%20P.%20Diaz%20construction%20Reviews.webp",
   },
 ];
 
@@ -173,19 +177,18 @@ export default function Home() {
   return (
     <>
       {/* ════════════ HERO ════════════ */}
-      <section className="relative min-h-[90vh] flex items-center bg-navy-950 overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: `repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 40px,
-            #c8a45e 40px,
-            #c8a45e 41px
-          )`,
-        }} />
+      <section className="relative min-h-screen flex items-center bg-navy-950 overflow-hidden">
+        {/* Background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://diazconstructions.com/diaz-hero3.webp')`,
+          }}
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-navy-950/75" />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-950 via-navy-900/95 to-navy-800/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-navy-950/80 via-navy-900/60 to-transparent" />
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-24 md:py-32">
           <p className="text-accent font-medium tracking-widest uppercase text-sm mb-6">
@@ -383,9 +386,18 @@ export default function Home() {
                 <p className="mt-4 text-gray-700 leading-relaxed italic">
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <p className="font-semibold text-navy-950">{t.name}</p>
-                  <p className="text-sm text-gray-500">{t.location}</p>
+                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center gap-3">
+                  <Image
+                    src={t.image}
+                    alt={t.name}
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-semibold text-navy-950">{t.name}</p>
+                    <p className="text-sm text-gray-500">{t.location}</p>
+                  </div>
                 </div>
               </div>
             ))}

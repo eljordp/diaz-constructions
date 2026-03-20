@@ -48,10 +48,12 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-18">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 shrink-0">
-              <span className="text-xl lg:text-2xl font-bold tracking-wider text-white">
-                DIAZ<span className="text-accent ml-1.5">CONSTRUCTION</span>
-              </span>
+            <Link href="/" className="flex items-center shrink-0">
+              <img
+                src="https://diazconstructions.com/logo-outline.webp"
+                alt="Diaz Construction"
+                className="h-12"
+              />
             </Link>
 
             {/* Desktop Links */}

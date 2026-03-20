@@ -39,9 +39,11 @@ export default function Footer() {
           {/* Company Info */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-block mb-5">
-              <span className="text-xl font-bold tracking-wider text-white">
-                DIAZ<span className="text-accent ml-1.5">CONSTRUCTION</span>
-              </span>
+              <img
+                src="https://diazconstructions.com/logo-outline.webp"
+                alt="Diaz Construction"
+                className="h-12"
+              />
             </Link>
             <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">
               Quality craftsmanship since 2009. We build with integrity, precision, and an unwavering commitment to excellence across the Bay Area.
