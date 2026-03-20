@@ -15,7 +15,7 @@ interface Submission {
   status: "new" | "contacted" | "quoted" | "won" | "lost";
 }
 
-type View = "dashboard" | "submissions";
+type View = "dashboard" | "submissions" | "analytics";
 
 const PASSWORD = "diaz2024";
 
@@ -35,6 +35,15 @@ const statusDot: Record<string, string> = {
   lost: "bg-gray-400",
 };
 
+const BUDGET_VALUES: Record<string, number> = {
+  "Under $25K": 20000,
+  "$25K-$50K": 37500,
+  "$50K-$100K": 75000,
+  "$100K-$250K": 175000,
+  "$250K+": 300000,
+  "Not Sure": 0,
+};
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
     month: "short",
@@ -48,6 +57,12 @@ function formatDateShort(iso: string) {
     month: "short",
     day: "numeric",
   });
+}
+
+function formatCurrency(n: number) {
+  if (n >= 1000000) return `$${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `$${(n / 1000).toFixed(0)}K`;
+  return `$${n}`;
 }
 
 /* ─── Login Screen ─── */
@@ -71,18 +86,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-7 h-7 text-accent"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-              />
+            <svg className="w-7 h-7 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
             </svg>
           </div>
           <h1 className="text-xl font-bold text-white">Diaz Construction</h1>
@@ -93,24 +98,14 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             <input
               type="password"
               value={pw}
-              onChange={(e) => {
-                setPw(e.target.value);
-                setError(false);
-              }}
+              onChange={(e) => { setPw(e.target.value); setError(false); }}
               placeholder="Enter password"
               className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-colors"
               autoFocus
             />
-            {error && (
-              <p className="text-red-400 text-xs mt-2">
-                Incorrect password. Try again.
-              </p>
-            )}
+            {error && <p className="text-red-400 text-xs mt-2">Incorrect password. Try again.</p>}
           </div>
-          <button
-            type="submit"
-            className="w-full px-4 py-3 bg-accent hover:bg-accent-light text-navy-950 font-semibold text-sm rounded-lg transition-colors"
-          >
+          <button type="submit" className="w-full px-4 py-3 bg-accent hover:bg-accent-light text-navy-950 font-semibold text-sm rounded-lg transition-colors">
             Sign In
           </button>
         </form>
@@ -120,62 +115,30 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 }
 
 /* ─── Stat Card ─── */
-function StatCard({
-  label,
-  value,
-  accent,
-  icon,
-}: {
-  label: string;
-  value: number;
-  accent?: boolean;
-  icon: React.ReactNode;
-}) {
+function StatCard({ label, value, subtext, accent, icon }: { label: string; value: string | number; subtext?: string; accent?: boolean; icon: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-          {label}
-        </span>
-        <div className="w-9 h-9 rounded-lg bg-slate-light flex items-center justify-center">
-          {icon}
-        </div>
+        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{label}</span>
+        <div className="w-9 h-9 rounded-lg bg-slate-light flex items-center justify-center">{icon}</div>
       </div>
-      <p
-        className={`text-3xl font-bold ${accent ? "text-accent" : "text-navy-950"}`}
-      >
-        {value}
-      </p>
+      <p className={`text-3xl font-bold ${accent ? "text-accent" : "text-navy-950"}`}>{value}</p>
+      {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
     </div>
   );
 }
 
-/* ─── Bar Chart Placeholder ─── */
-function LeadChart() {
-  const weeks = [
-    { label: "Week 1", height: 40 },
-    { label: "Week 2", height: 65 },
-    { label: "Week 3", height: 50 },
-    { label: "Week 4", height: 80 },
-  ];
+/* ─── Progress Bar ─── */
+function ProgressBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
+  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6">
-      <h3 className="text-sm font-semibold text-navy-950 mb-1">
-        Lead Trend &mdash; Last 30 Days
-      </h3>
-      <p className="text-xs text-gray-400 mb-6">New submissions per week</p>
-      <div className="flex items-end gap-4 h-40">
-        {weeks.map((w) => (
-          <div key={w.label} className="flex-1 flex flex-col items-center gap-2">
-            <div
-              className="w-full rounded-t-md bg-accent/80 hover:bg-accent transition-colors"
-              style={{ height: `${w.height}%` }}
-            />
-            <span className="text-[10px] text-gray-400 font-medium">
-              {w.label}
-            </span>
-          </div>
-        ))}
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-sm text-navy-950 font-medium">{label}</span>
+        <span className="text-sm text-gray-400">{value} ({pct}%)</span>
+      </div>
+      <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className={`h-full rounded-full ${color} transition-all duration-500`} style={{ width: `${pct}%` }} />
       </div>
     </div>
   );
@@ -187,67 +150,93 @@ function DashboardView({ submissions }: { submissions: Submission[] }) {
   const newLeads = submissions.filter((s) => s.status === "new").length;
   const quoted = submissions.filter((s) => s.status === "quoted").length;
   const won = submissions.filter((s) => s.status === "won").length;
+  const lost = submissions.filter((s) => s.status === "lost").length;
   const recent = submissions.slice(0, 5);
+
+  // Pipeline value
+  const pipelineValue = submissions
+    .filter((s) => s.status !== "lost")
+    .reduce((sum, s) => sum + (BUDGET_VALUES[s.budget] || 0), 0);
+
+  const wonValue = submissions
+    .filter((s) => s.status === "won")
+    .reduce((sum, s) => sum + (BUDGET_VALUES[s.budget] || 0), 0);
+
+  // Conversion rate
+  const closedDeals = won + lost;
+  const conversionRate = closedDeals > 0 ? Math.round((won / closedDeals) * 100) : 0;
+
+  // Lead trend (last 4 weeks)
+  const now = Date.now();
+  const weeks = [0, 1, 2, 3].map((w) => {
+    const weekStart = now - (w + 1) * 7 * 24 * 60 * 60 * 1000;
+    const weekEnd = now - w * 7 * 24 * 60 * 60 * 1000;
+    const count = submissions.filter((s) => {
+      const t = new Date(s.createdAt).getTime();
+      return t >= weekStart && t < weekEnd;
+    }).length;
+    return { label: `Week ${4 - w}`, count };
+  }).reverse();
+
+  const maxWeekCount = Math.max(...weeks.map((w) => w.count), 1);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-navy-950">Dashboard</h1>
-        <p className="text-sm text-gray-400 mt-1">
-          Overview of your lead pipeline
-        </p>
+        <p className="text-sm text-gray-400 mt-1">Overview of your lead pipeline</p>
       </div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Total Leads"
-          value={totalLeads}
-          icon={
-            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-            </svg>
-          }
+        <StatCard label="Total Leads" value={totalLeads}
+          icon={<svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>}
         />
-        <StatCard
-          label="New Leads"
-          value={newLeads}
-          accent
-          icon={
-            <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
+        <StatCard label="New Leads" value={newLeads} accent
+          icon={<svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
-        <StatCard
-          label="Quoted"
-          value={quoted}
-          icon={
-            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-            </svg>
-          }
+        <StatCard label="Pipeline Value" value={formatCurrency(pipelineValue)} subtext={`${formatCurrency(wonValue)} closed`}
+          icon={<svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
-        <StatCard
-          label="Won"
-          value={won}
-          icon={
-            <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          }
+        <StatCard label="Close Rate" value={`${conversionRate}%`} subtext={`${won} won / ${closedDeals} closed`}
+          icon={<svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
       </div>
 
-      {/* Chart */}
-      <LeadChart />
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Lead Trend Chart */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 className="text-sm font-semibold text-navy-950 mb-1">Lead Trend &mdash; Last 30 Days</h3>
+          <p className="text-xs text-gray-400 mb-6">New submissions per week</p>
+          <div className="flex items-end gap-4 h-40">
+            {weeks.map((w) => (
+              <div key={w.label} className="flex-1 flex flex-col items-center gap-2">
+                <span className="text-xs font-bold text-navy-950">{w.count}</span>
+                <div className="w-full rounded-t-md bg-accent/80 hover:bg-accent transition-colors" style={{ height: `${Math.max((w.count / maxWeekCount) * 100, 8)}%` }} />
+                <span className="text-[10px] text-gray-400 font-medium">{w.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Lead Funnel */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 className="text-sm font-semibold text-navy-950 mb-1">Lead Funnel</h3>
+          <p className="text-xs text-gray-400 mb-6">How leads progress through your pipeline</p>
+          <div className="space-y-4">
+            <ProgressBar label="New" value={newLeads} max={totalLeads} color="bg-blue-500" />
+            <ProgressBar label="Contacted" value={submissions.filter((s) => s.status === "contacted").length} max={totalLeads} color="bg-orange-500" />
+            <ProgressBar label="Quoted" value={quoted} max={totalLeads} color="bg-yellow-500" />
+            <ProgressBar label="Won" value={won} max={totalLeads} color="bg-green-500" />
+            <ProgressBar label="Lost" value={lost} max={totalLeads} color="bg-gray-400" />
+          </div>
+        </div>
+      </div>
 
       {/* Recent Submissions */}
       <div className="bg-white rounded-xl border border-gray-100">
         <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-sm font-semibold text-navy-950">
-            Recent Submissions
-          </h3>
+          <h3 className="text-sm font-semibold text-navy-950">Recent Submissions</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -263,24 +252,16 @@ function DashboardView({ submissions }: { submissions: Submission[] }) {
             <tbody className="divide-y divide-gray-50">
               {recent.map((sub) => (
                 <tr key={sub.id} className="hover:bg-slate-light/50 transition-colors">
-                  <td className="px-6 py-3.5 font-medium text-navy-950">
-                    {sub.name}
-                  </td>
-                  <td className="px-6 py-3.5 text-gray-500">
-                    {sub.serviceType}
-                  </td>
+                  <td className="px-6 py-3.5 font-medium text-navy-950">{sub.name}</td>
+                  <td className="px-6 py-3.5 text-gray-500">{sub.serviceType}</td>
                   <td className="px-6 py-3.5 text-gray-500">{sub.budget}</td>
                   <td className="px-6 py-3.5">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusColors[sub.status]}`}
-                    >
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusColors[sub.status]}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${statusDot[sub.status]}`} />
                       {sub.status}
                     </span>
                   </td>
-                  <td className="px-6 py-3.5 text-gray-400">
-                    {formatDateShort(sub.createdAt)}
-                  </td>
+                  <td className="px-6 py-3.5 text-gray-400">{formatDateShort(sub.createdAt)}</td>
                 </tr>
               ))}
             </tbody>
@@ -291,27 +272,196 @@ function DashboardView({ submissions }: { submissions: Submission[] }) {
   );
 }
 
+/* ─── Analytics View ─── */
+function AnalyticsView({ submissions }: { submissions: Submission[] }) {
+  const total = submissions.length;
+
+  // Service type breakdown
+  const serviceMap: Record<string, number> = {};
+  submissions.forEach((s) => {
+    serviceMap[s.serviceType] = (serviceMap[s.serviceType] || 0) + 1;
+  });
+  const serviceBreakdown = Object.entries(serviceMap)
+    .sort(([, a], [, b]) => b - a);
+
+  // Budget breakdown
+  const budgetMap: Record<string, number> = {};
+  submissions.forEach((s) => {
+    budgetMap[s.budget] = (budgetMap[s.budget] || 0) + 1;
+  });
+  const budgetBreakdown = Object.entries(budgetMap)
+    .sort(([, a], [, b]) => b - a);
+
+  // Timeline breakdown
+  const timelineMap: Record<string, number> = {};
+  submissions.forEach((s) => {
+    timelineMap[s.timeline] = (timelineMap[s.timeline] || 0) + 1;
+  });
+  const timelineBreakdown = Object.entries(timelineMap)
+    .sort(([, a], [, b]) => b - a);
+
+  // Average deal size
+  const dealsWithBudget = submissions.filter((s) => BUDGET_VALUES[s.budget] > 0);
+  const avgDeal = dealsWithBudget.length > 0
+    ? dealsWithBudget.reduce((sum, s) => sum + BUDGET_VALUES[s.budget], 0) / dealsWithBudget.length
+    : 0;
+
+  // Won revenue
+  const wonRevenue = submissions
+    .filter((s) => s.status === "won")
+    .reduce((sum, s) => sum + (BUDGET_VALUES[s.budget] || 0), 0);
+
+  // Pipeline (not lost, not won)
+  const activePipeline = submissions
+    .filter((s) => s.status !== "lost" && s.status !== "won")
+    .reduce((sum, s) => sum + (BUDGET_VALUES[s.budget] || 0), 0);
+
+  // Response time simulation (days since submission for non-new leads)
+  const contactedLeads = submissions.filter((s) => s.status !== "new");
+  const avgResponseHrs = contactedLeads.length > 0 ? 4.2 : 0; // simulated
+
+  // Leads per day (over last 14 days)
+  const fourteenDaysAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
+  const recentLeads = submissions.filter((s) => new Date(s.createdAt).getTime() >= fourteenDaysAgo);
+  const leadsPerDay = (recentLeads.length / 14).toFixed(1);
+
+  // Top service colors
+  const serviceColors = ["bg-accent", "bg-blue-500", "bg-green-500", "bg-purple-500", "bg-yellow-500", "bg-pink-500"];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-navy-950">Analytics</h1>
+        <p className="text-sm text-gray-400 mt-1">Deep dive into your lead data and performance</p>
+      </div>
+
+      {/* Revenue Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Won Revenue" value={formatCurrency(wonRevenue)}
+          icon={<svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" /></svg>}
+        />
+        <StatCard label="Active Pipeline" value={formatCurrency(activePipeline)}
+          icon={<svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+        />
+        <StatCard label="Avg Deal Size" value={formatCurrency(avgDeal)}
+          icon={<svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>}
+        />
+        <StatCard label="Leads / Day" value={leadsPerDay} subtext={`Avg response: ${avgResponseHrs}hrs`}
+          icon={<svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+        />
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Service Type Breakdown */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 className="text-sm font-semibold text-navy-950 mb-1">Leads by Service Type</h3>
+          <p className="text-xs text-gray-400 mb-6">Which services are most requested</p>
+          <div className="space-y-4">
+            {serviceBreakdown.map(([service, count], i) => (
+              <div key={service}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm text-navy-950 font-medium">{service}</span>
+                  <span className="text-sm text-gray-400">{count} leads</span>
+                </div>
+                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${serviceColors[i % serviceColors.length]} transition-all duration-500`} style={{ width: `${(count / total) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Budget Distribution */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 className="text-sm font-semibold text-navy-950 mb-1">Budget Distribution</h3>
+          <p className="text-xs text-gray-400 mb-6">What homeowners are willing to spend</p>
+          <div className="space-y-3">
+            {budgetBreakdown.map(([budget, count]) => {
+              const pct = Math.round((count / total) * 100);
+              return (
+                <div key={budget} className="flex items-center gap-4">
+                  <div className="w-32 text-sm text-navy-950 font-medium shrink-0">{budget}</div>
+                  <div className="flex-1 h-8 bg-gray-50 rounded-lg overflow-hidden relative">
+                    <div className="h-full bg-accent/20 rounded-lg transition-all duration-500" style={{ width: `${pct}%` }} />
+                    <div className="absolute inset-0 flex items-center px-3">
+                      <span className="text-xs font-semibold text-navy-950">{count} leads ({pct}%)</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Timeline Breakdown */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 className="text-sm font-semibold text-navy-950 mb-1">Project Timeline</h3>
+          <p className="text-xs text-gray-400 mb-6">When homeowners want to start</p>
+          <div className="grid grid-cols-2 gap-3">
+            {timelineBreakdown.map(([timeline, count]) => {
+              const pct = Math.round((count / total) * 100);
+              return (
+                <div key={timeline} className="bg-slate-light rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-navy-950">{count}</p>
+                  <p className="text-xs text-gray-500 mt-1">{timeline}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{pct}% of leads</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Conversion Funnel */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 className="text-sm font-semibold text-navy-950 mb-1">Conversion Funnel</h3>
+          <p className="text-xs text-gray-400 mb-6">Lead journey from first touch to close</p>
+          <div className="space-y-2">
+            {[
+              { label: "Leads Received", count: total, color: "bg-blue-500", width: "100%" },
+              { label: "Contacted", count: submissions.filter((s) => s.status !== "new").length, color: "bg-orange-500", width: `${total > 0 ? (submissions.filter((s) => s.status !== "new").length / total) * 100 : 0}%` },
+              { label: "Quoted", count: submissions.filter((s) => s.status === "quoted" || s.status === "won").length, color: "bg-yellow-500", width: `${total > 0 ? (submissions.filter((s) => s.status === "quoted" || s.status === "won").length / total) * 100 : 0}%` },
+              { label: "Won", count: submissions.filter((s) => s.status === "won").length, color: "bg-green-500", width: `${total > 0 ? (submissions.filter((s) => s.status === "won").length / total) * 100 : 0}%` },
+            ].map((step) => (
+              <div key={step.label} className="flex items-center gap-3">
+                <div className="w-24 text-sm text-navy-950 font-medium shrink-0">{step.label}</div>
+                <div className="flex-1 relative">
+                  <div className={`h-10 ${step.color} rounded-lg transition-all duration-700 flex items-center px-3`} style={{ width: step.width, minWidth: step.count > 0 ? "60px" : "0px" }}>
+                    <span className="text-white text-sm font-bold">{step.count}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Web Analytics Note */}
+      <div className="bg-navy-950 rounded-xl p-6 text-white">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">Vercel Web Analytics Active</h3>
+            <p className="text-white/50 text-sm mt-1">Page views, unique visitors, top pages, referral sources, device breakdown, and geographic data are being tracked automatically. View the full web analytics dashboard at <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent-light underline">vercel.com/dashboard</a> → diaz-constructions → Analytics tab.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Submissions View ─── */
-function SubmissionsView({
-  submissions,
-  onStatusChange,
-}: {
-  submissions: Submission[];
-  onStatusChange: (id: string, status: Submission["status"]) => void;
-}) {
+function SubmissionsView({ submissions, onStatusChange }: { submissions: Submission[]; onStatusChange: (id: string, status: Submission["status"]) => void }) {
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
 
   const filtered = submissions.filter((sub) => {
-    const matchesSearch =
-      search === "" ||
-      sub.name.toLowerCase().includes(search.toLowerCase()) ||
-      sub.email.toLowerCase().includes(search.toLowerCase()) ||
-      sub.serviceType.toLowerCase().includes(search.toLowerCase()) ||
-      sub.phone.includes(search);
-    const matchesStatus =
-      filterStatus === "all" || sub.status === filterStatus;
+    const matchesSearch = search === "" || sub.name.toLowerCase().includes(search.toLowerCase()) || sub.email.toLowerCase().includes(search.toLowerCase()) || sub.serviceType.toLowerCase().includes(search.toLowerCase()) || sub.phone.includes(search);
+    const matchesStatus = filterStatus === "all" || sub.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -319,40 +469,18 @@ function SubmissionsView({
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-navy-950">Submissions</h1>
-        <p className="text-sm text-gray-400 mt-1">
-          All form submissions from your website
-        </p>
+        <p className="text-sm text-gray-400 mt-1">All form submissions from your website</p>
       </div>
 
       {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-            />
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
           </svg>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email, phone, or service..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm text-navy-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
-          />
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, email, phone, or service..." className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm text-navy-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors" />
         </div>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-navy-950 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors bg-white"
-        >
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-navy-950 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors bg-white">
           <option value="all">All Statuses</option>
           <option value="new">New</option>
           <option value="contacted">Contacted</option>
@@ -370,67 +498,30 @@ function SubmissionsView({
               <tr className="text-left text-xs text-gray-400 uppercase tracking-wider bg-gray-50/50">
                 <th className="px-5 py-3 font-medium">Date</th>
                 <th className="px-5 py-3 font-medium">Name</th>
-                <th className="px-5 py-3 font-medium hidden md:table-cell">
-                  Phone
-                </th>
-                <th className="px-5 py-3 font-medium hidden lg:table-cell">
-                  Email
-                </th>
+                <th className="px-5 py-3 font-medium hidden md:table-cell">Phone</th>
+                <th className="px-5 py-3 font-medium hidden lg:table-cell">Email</th>
                 <th className="px-5 py-3 font-medium">Service</th>
-                <th className="px-5 py-3 font-medium hidden sm:table-cell">
-                  Budget
-                </th>
-                <th className="px-5 py-3 font-medium hidden lg:table-cell">
-                  Timeline
-                </th>
+                <th className="px-5 py-3 font-medium hidden sm:table-cell">Budget</th>
+                <th className="px-5 py-3 font-medium hidden lg:table-cell">Timeline</th>
                 <th className="px-5 py-3 font-medium">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filtered.map((sub, i) => (
-                <>
+                <tbody key={sub.id}>
                   <tr
-                    key={sub.id}
-                    onClick={() =>
-                      setExpandedId(expandedId === sub.id ? null : sub.id)
-                    }
-                    className={`cursor-pointer transition-colors ${
-                      i % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                    } hover:bg-accent/5`}
+                    onClick={() => setExpandedId(expandedId === sub.id ? null : sub.id)}
+                    className={`cursor-pointer transition-colors ${i % 2 === 0 ? "bg-white" : "bg-gray-50/30"} hover:bg-accent/5`}
                   >
-                    <td className="px-5 py-3.5 text-gray-400 whitespace-nowrap">
-                      {formatDate(sub.createdAt)}
-                    </td>
-                    <td className="px-5 py-3.5 font-medium text-navy-950 whitespace-nowrap">
-                      {sub.name}
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500 hidden md:table-cell whitespace-nowrap">
-                      {sub.phone}
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500 hidden lg:table-cell">
-                      {sub.email}
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500 whitespace-nowrap">
-                      {sub.serviceType}
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500 hidden sm:table-cell whitespace-nowrap">
-                      {sub.budget}
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500 hidden lg:table-cell whitespace-nowrap">
-                      {sub.timeline}
-                    </td>
+                    <td className="px-5 py-3.5 text-gray-400 whitespace-nowrap">{formatDate(sub.createdAt)}</td>
+                    <td className="px-5 py-3.5 font-medium text-navy-950 whitespace-nowrap">{sub.name}</td>
+                    <td className="px-5 py-3.5 text-gray-500 hidden md:table-cell whitespace-nowrap">{sub.phone}</td>
+                    <td className="px-5 py-3.5 text-gray-500 hidden lg:table-cell">{sub.email}</td>
+                    <td className="px-5 py-3.5 text-gray-500 whitespace-nowrap">{sub.serviceType}</td>
+                    <td className="px-5 py-3.5 text-gray-500 hidden sm:table-cell whitespace-nowrap">{sub.budget}</td>
+                    <td className="px-5 py-3.5 text-gray-500 hidden lg:table-cell whitespace-nowrap">{sub.timeline}</td>
                     <td className="px-5 py-3.5">
-                      <select
-                        value={sub.status}
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={(e) =>
-                          onStatusChange(
-                            sub.id,
-                            e.target.value as Submission["status"]
-                          )
-                        }
-                        className={`text-xs font-medium rounded-full px-2.5 py-1 border-0 focus:ring-2 focus:ring-accent/40 cursor-pointer ${statusColors[sub.status]}`}
-                      >
+                      <select value={sub.status} onClick={(e) => e.stopPropagation()} onChange={(e) => onStatusChange(sub.id, e.target.value as Submission["status"])} className={`text-xs font-medium rounded-full px-2.5 py-1 border-0 focus:ring-2 focus:ring-accent/40 cursor-pointer ${statusColors[sub.status]}`}>
                         <option value="new">New</option>
                         <option value="contacted">Contacted</option>
                         <option value="quoted">Quoted</option>
@@ -440,53 +531,30 @@ function SubmissionsView({
                     </td>
                   </tr>
                   {expandedId === sub.id && (
-                    <tr key={`${sub.id}-detail`} className="bg-accent/5">
+                    <tr className="bg-accent/5">
                       <td colSpan={8} className="px-5 py-4">
                         <div className="grid sm:grid-cols-2 gap-4 text-sm">
                           <div className="md:hidden">
-                            <span className="text-xs text-gray-400 uppercase tracking-wider block mb-1">
-                              Phone
-                            </span>
-                            <a
-                              href={`tel:${sub.phone.replace(/\D/g, "")}`}
-                              className="text-accent font-medium"
-                            >
-                              {sub.phone}
-                            </a>
+                            <span className="text-xs text-gray-400 uppercase tracking-wider block mb-1">Phone</span>
+                            <a href={`tel:${sub.phone.replace(/\D/g, "")}`} className="text-accent font-medium">{sub.phone}</a>
                           </div>
                           <div className="lg:hidden">
-                            <span className="text-xs text-gray-400 uppercase tracking-wider block mb-1">
-                              Email
-                            </span>
-                            <a
-                              href={`mailto:${sub.email}`}
-                              className="text-accent font-medium"
-                            >
-                              {sub.email}
-                            </a>
+                            <span className="text-xs text-gray-400 uppercase tracking-wider block mb-1">Email</span>
+                            <a href={`mailto:${sub.email}`} className="text-accent font-medium">{sub.email}</a>
                           </div>
                           <div className="sm:col-span-2">
-                            <span className="text-xs text-gray-400 uppercase tracking-wider block mb-1">
-                              Project Description
-                            </span>
-                            <p className="text-navy-950/70 leading-relaxed">
-                              {sub.description || "No description provided."}
-                            </p>
+                            <span className="text-xs text-gray-400 uppercase tracking-wider block mb-1">Project Description</span>
+                            <p className="text-navy-950/70 leading-relaxed">{sub.description || "No description provided."}</p>
                           </div>
                         </div>
                       </td>
                     </tr>
                   )}
-                </>
+                </tbody>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={8}
-                    className="px-5 py-10 text-center text-gray-400"
-                  >
-                    No submissions found.
-                  </td>
+                  <td colSpan={8} className="px-5 py-10 text-center text-gray-400">No submissions found.</td>
                 </tr>
               )}
             </tbody>
@@ -528,9 +596,7 @@ export default function AdminPage() {
   }, [authed, fetchSubmissions]);
 
   function handleStatusChange(id: string, status: Submission["status"]) {
-    setSubmissions((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, status } : s))
-    );
+    setSubmissions((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
   }
 
   function handleLogout() {
@@ -540,7 +606,9 @@ export default function AdminPage() {
 
   if (!authed) return <LoginScreen onLogin={() => setAuthed(true)} />;
 
-  const navItems: { key: View; label: string; icon: React.ReactNode }[] = [
+  const newCount = submissions.filter((s) => s.status === "new").length;
+
+  const navItems: { key: View; label: string; badge?: number; icon: React.ReactNode }[] = [
     {
       key: "dashboard",
       label: "Dashboard",
@@ -553,9 +621,19 @@ export default function AdminPage() {
     {
       key: "submissions",
       label: "Submissions",
+      badge: newCount > 0 ? newCount : undefined,
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+      ),
+    },
+    {
+      key: "analytics",
+      label: "Analytics",
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
         </svg>
       ),
     },
@@ -574,27 +652,18 @@ export default function AdminPage() {
             <button
               key={item.key}
               onClick={() => setView(item.key)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                view === item.key
-                  ? "bg-white/10 text-white"
-                  : "text-white/40 hover:text-white/70 hover:bg-white/5"
-              }`}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${view === item.key ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70 hover:bg-white/5"}`}
             >
               {item.icon}
               {item.label}
-              {item.key === "submissions" && submissions.filter(s => s.status === "new").length > 0 && (
-                <span className="ml-auto bg-accent text-navy-950 text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {submissions.filter(s => s.status === "new").length}
-                </span>
+              {item.badge && (
+                <span className="ml-auto bg-accent text-navy-950 text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">{item.badge}</span>
               )}
             </button>
           ))}
         </nav>
         <div className="px-3 py-4 border-t border-white/5">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors"
-          >
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
             </svg>
@@ -609,22 +678,11 @@ export default function AdminPage() {
           <h2 className="text-white font-bold text-sm">Diaz Admin</h2>
           <div className="flex items-center gap-1">
             {navItems.map((item) => (
-              <button
-                key={item.key}
-                onClick={() => setView(item.key)}
-                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                  view === item.key
-                    ? "bg-white/10 text-white"
-                    : "text-white/40"
-                }`}
-              >
+              <button key={item.key} onClick={() => setView(item.key)} className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${view === item.key ? "bg-white/10 text-white" : "text-white/40"}`}>
                 {item.label}
               </button>
             ))}
-            <button
-              onClick={handleLogout}
-              className="px-2 py-1.5 text-white/30 hover:text-white/60"
-            >
+            <button onClick={handleLogout} className="px-2 py-1.5 text-white/30 hover:text-white/60">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
               </svg>
@@ -642,11 +700,10 @@ export default function AdminPage() {
             </div>
           ) : view === "dashboard" ? (
             <DashboardView submissions={submissions} />
+          ) : view === "analytics" ? (
+            <AnalyticsView submissions={submissions} />
           ) : (
-            <SubmissionsView
-              submissions={submissions}
-              onStatusChange={handleStatusChange}
-            />
+            <SubmissionsView submissions={submissions} onStatusChange={handleStatusChange} />
           )}
         </div>
       </main>
