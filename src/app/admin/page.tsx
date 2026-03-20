@@ -15,7 +15,7 @@ interface Submission {
   status: "new" | "contacted" | "quoted" | "won" | "lost";
 }
 
-type View = "dashboard" | "submissions" | "analytics";
+type View = "dashboard" | "submissions" | "analytics" | "kanban";
 
 const PASSWORD = "diaz2024";
 
@@ -202,6 +202,39 @@ function DashboardView({ submissions }: { submissions: Submission[] }) {
           icon={<svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
       </div>
+
+      {/* Hottest Lead */}
+      {(() => {
+        const hottestLead = submissions
+          .filter(s => s.status === "new")
+          .sort((a, b) => (BUDGET_VALUES[b.budget] || 0) - (BUDGET_VALUES[a.budget] || 0))[0];
+        if (!hottestLead) return null;
+        const daysAgo = Math.floor((Date.now() - new Date(hottestLead.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+        const timeAgo = daysAgo === 0 ? "Today" : daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`;
+        return (
+          <div className="bg-white rounded-xl border border-gray-100 border-l-4 border-l-accent p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Hottest Lead</p>
+                <p className="text-lg font-bold text-navy-950">{hottestLead.name}</p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-sm text-gray-500">
+                  <span>{hottestLead.serviceType}</span>
+                  <span className="font-semibold text-navy-950">{hottestLead.budget}</span>
+                  <a href={`tel:${hottestLead.phone.replace(/\D/g, "")}`} className="text-accent hover:text-accent-dark font-medium inline-flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+                    {hottestLead.phone}
+                  </a>
+                  <span className="text-gray-400">{timeAgo}</span>
+                </div>
+              </div>
+              <a href={`tel:${hottestLead.phone.replace(/\D/g, "")}`} className="shrink-0 ml-4 px-4 py-2 bg-accent hover:bg-accent-light text-navy-950 text-sm font-semibold rounded-lg transition-colors inline-flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+                Call Now
+              </a>
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Lead Trend Chart */}
@@ -453,6 +486,119 @@ function AnalyticsView({ submissions }: { submissions: Submission[] }) {
   );
 }
 
+/* ─── Kanban View ─── */
+const KANBAN_COLUMNS: { status: Submission["status"]; label: string; headerBg: string }[] = [
+  { status: "new", label: "New", headerBg: "bg-blue-500" },
+  { status: "contacted", label: "Contacted", headerBg: "bg-orange-500" },
+  { status: "quoted", label: "Quoted", headerBg: "bg-yellow-500" },
+  { status: "won", label: "Won", headerBg: "bg-green-500" },
+  { status: "lost", label: "Lost", headerBg: "bg-gray-400" },
+];
+
+function KanbanView({ submissions, onStatusChange }: { submissions: Submission[]; onStatusChange: (id: string, status: Submission["status"]) => void }) {
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+
+  function handleDragStart(e: React.DragEvent, id: string) {
+    e.dataTransfer.setData("text/plain", id);
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  function handleDragOver(e: React.DragEvent, status: string) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverColumn(status);
+  }
+
+  function handleDragLeave() {
+    setDragOverColumn(null);
+  }
+
+  function handleDrop(e: React.DragEvent, status: Submission["status"]) {
+    e.preventDefault();
+    setDragOverColumn(null);
+    const id = e.dataTransfer.getData("text/plain");
+    if (id) onStatusChange(id, status);
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-navy-950">Pipeline</h1>
+        <p className="text-sm text-gray-400 mt-1">Drag leads between columns to update their status</p>
+      </div>
+
+      <div className="flex gap-4 overflow-x-auto pb-4" style={{ minHeight: "calc(100vh - 200px)" }}>
+        {KANBAN_COLUMNS.map((col) => {
+          const colSubmissions = submissions.filter((s) => s.status === col.status);
+          const colValue = colSubmissions.reduce((sum, s) => sum + (BUDGET_VALUES[s.budget] || 0), 0);
+          const isOver = dragOverColumn === col.status;
+
+          return (
+            <div
+              key={col.status}
+              className={`flex flex-col shrink-0 w-72 rounded-xl border transition-colors ${isOver ? "border-accent bg-accent/5" : "border-gray-200 bg-gray-50/50"}`}
+              onDragOver={(e) => handleDragOver(e, col.status)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, col.status)}
+            >
+              {/* Column Header */}
+              <div className={`${col.headerBg} rounded-t-xl px-4 py-3`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-semibold text-sm">{col.label}</span>
+                  <span className="bg-white/20 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">{colSubmissions.length}</span>
+                </div>
+                <p className="text-white/70 text-xs mt-1">{formatCurrency(colValue)}</p>
+              </div>
+
+              {/* Card List */}
+              <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                {colSubmissions.length === 0 && (
+                  <div className="text-center py-8 text-gray-300 text-xs">No leads</div>
+                )}
+                {colSubmissions.map((sub) => (
+                  <div
+                    key={sub.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, sub.id)}
+                    className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <p className="font-semibold text-navy-950 text-sm">{sub.name}</p>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium capitalize ${statusColors[sub.status]}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${statusDot[sub.status]}`} />
+                        {sub.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-1">{sub.serviceType}</p>
+                    <p className="text-xs font-medium text-navy-950 mb-3">{sub.budget}</p>
+
+                    <div className="space-y-1.5 border-t border-gray-50 pt-3">
+                      <a href={`tel:${sub.phone.replace(/\D/g, "")}`} className="flex items-center gap-2 text-xs text-accent hover:text-accent-light transition-colors">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        {sub.phone}
+                      </a>
+                      <a href={`mailto:${sub.email}`} className="flex items-center gap-2 text-xs text-accent hover:text-accent-light transition-colors truncate">
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                        <span className="truncate">{sub.email}</span>
+                      </a>
+                    </div>
+
+                    <p className="text-[10px] text-gray-300 mt-3">{formatDate(sub.createdAt)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Submissions View ─── */
 function SubmissionsView({ submissions, onStatusChange }: { submissions: Submission[]; onStatusChange: (id: string, status: Submission["status"]) => void }) {
   const [search, setSearch] = useState("");
@@ -464,6 +610,29 @@ function SubmissionsView({ submissions, onStatusChange }: { submissions: Submiss
     const matchesStatus = filterStatus === "all" || sub.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  function exportCSV(data: Submission[]) {
+    const headers = ["Date","Name","Phone","Email","Service","Budget","Timeline","Status","Description"];
+    const rows = data.map(s => [
+      formatDate(s.createdAt),
+      s.name,
+      s.phone,
+      s.email,
+      s.serviceType,
+      s.budget,
+      s.timeline,
+      s.status,
+      `"${(s.description || '').replace(/"/g, '""')}"`
+    ].join(","));
+    const csv = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `diaz-leads-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="space-y-6">
@@ -488,6 +657,13 @@ function SubmissionsView({ submissions, onStatusChange }: { submissions: Submiss
           <option value="won">Won</option>
           <option value="lost">Lost</option>
         </select>
+        <button
+          onClick={() => exportCSV(filtered)}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-navy-950 hover:bg-gray-50 transition-colors bg-white"
+        >
+          <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+          Export CSV
+        </button>
       </div>
 
       {/* Table */}
@@ -515,8 +691,18 @@ function SubmissionsView({ submissions, onStatusChange }: { submissions: Submiss
                   >
                     <td className="px-5 py-3.5 text-gray-400 whitespace-nowrap">{formatDate(sub.createdAt)}</td>
                     <td className="px-5 py-3.5 font-medium text-navy-950 whitespace-nowrap">{sub.name}</td>
-                    <td className="px-5 py-3.5 text-gray-500 hidden md:table-cell whitespace-nowrap">{sub.phone}</td>
-                    <td className="px-5 py-3.5 text-gray-500 hidden lg:table-cell">{sub.email}</td>
+                    <td className="px-5 py-3.5 hidden md:table-cell whitespace-nowrap">
+                      <a href={`tel:${sub.phone.replace(/\D/g, "")}`} onClick={(e) => e.stopPropagation()} className="text-accent hover:text-accent-dark font-medium inline-flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+                        {sub.phone}
+                      </a>
+                    </td>
+                    <td className="px-5 py-3.5 hidden lg:table-cell">
+                      <a href={`mailto:${sub.email}`} onClick={(e) => e.stopPropagation()} className="text-accent hover:text-accent-dark font-medium inline-flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                        {sub.email}
+                      </a>
+                    </td>
                     <td className="px-5 py-3.5 text-gray-500 whitespace-nowrap">{sub.serviceType}</td>
                     <td className="px-5 py-3.5 text-gray-500 hidden sm:table-cell whitespace-nowrap">{sub.budget}</td>
                     <td className="px-5 py-3.5 text-gray-500 hidden lg:table-cell whitespace-nowrap">{sub.timeline}</td>
@@ -571,6 +757,7 @@ export default function AdminPage() {
   const [view, setView] = useState<View>("dashboard");
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -584,6 +771,7 @@ export default function AdminPage() {
       const res = await fetch("/api/submissions");
       const data = await res.json();
       setSubmissions(data);
+      setLastUpdated(new Date());
     } catch (err) {
       console.error("Failed to fetch submissions:", err);
     } finally {
@@ -615,6 +803,15 @@ export default function AdminPage() {
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+        </svg>
+      ),
+    },
+    {
+      key: "kanban",
+      label: "Pipeline",
+      icon: (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
         </svg>
       ),
     },
@@ -694,6 +891,31 @@ export default function AdminPage() {
       {/* Main Content */}
       <main className="flex-1 min-w-0">
         <div className="p-6 md:p-8 lg:p-10 md:pt-8 pt-16 max-w-6xl">
+          {/* Last Updated Bar */}
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs text-gray-400">
+              {lastUpdated
+                ? `Last updated: ${lastUpdated.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`
+                : ""}
+            </span>
+            <button
+              onClick={() => { setLoading(true); fetchSubmissions(); }}
+              disabled={loading}
+              className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
+              title="Refresh"
+            >
+              <svg
+                className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.015 4.356v4.992" />
+              </svg>
+            </button>
+          </div>
+
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
@@ -702,6 +924,8 @@ export default function AdminPage() {
             <DashboardView submissions={submissions} />
           ) : view === "analytics" ? (
             <AnalyticsView submissions={submissions} />
+          ) : view === "kanban" ? (
+            <KanbanView submissions={submissions} onStatusChange={handleStatusChange} />
           ) : (
             <SubmissionsView submissions={submissions} onStatusChange={handleStatusChange} />
           )}
