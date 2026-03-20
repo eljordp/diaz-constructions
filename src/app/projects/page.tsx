@@ -6,6 +6,7 @@ import Link from 'next/link';
 type Category = 'All' | 'Kitchen & Bath' | 'ADU' | 'Additions' | 'Hardscape';
 
 interface Project {
+  slug: string;
   name: string;
   category: Exclude<Category, 'All'>;
   city: string;
@@ -15,6 +16,7 @@ interface Project {
 
 const projects: Project[] = [
   {
+    slug: 'jennifers-master-bathroom',
     name: "Jennifer's Master Bathroom",
     category: 'Kitchen & Bath',
     city: 'Redwood City',
@@ -23,6 +25,7 @@ const projects: Project[] = [
     image: 'https://diazconstructions.com/projects/Sin%20Ubicacion/Bathroom/portada.webp',
   },
   {
+    slug: 'hermes-full-remodel',
     name: "Herme's Full Remodel",
     category: 'Kitchen & Bath',
     city: 'Menlo Park',
@@ -31,6 +34,7 @@ const projects: Project[] = [
     image: 'https://diazconstructions.com/projects/Sin%20Ubicacion/Closet/portada.webp',
   },
   {
+    slug: 'phil-adu',
     name: "Phil's ADU",
     category: 'ADU',
     city: 'Hayward',
@@ -39,6 +43,7 @@ const projects: Project[] = [
     image: 'https://diazconstructions.com/projects/Sin%20Ubicacion/Kitchen/portada.webp',
   },
   {
+    slug: 'ben-master-bedroom',
     name: "Ben's Master Bedroom",
     category: 'Additions',
     city: 'San Mateo',
@@ -47,6 +52,7 @@ const projects: Project[] = [
     image: 'https://diazconstructions.com/projects/Sin%20Ubicacion/Wood%20room/diaz-project8.1.webp',
   },
   {
+    slug: 'martinez-kitchen',
     name: 'Martinez Kitchen',
     category: 'Kitchen & Bath',
     city: 'Fremont',
@@ -55,6 +61,7 @@ const projects: Project[] = [
     image: 'https://diazconstructions.com/projects/LOS%20GATOS/Kitchen/diaz-kitchen2.webp',
   },
   {
+    slug: 'sunset-patio',
     name: 'Sunset Patio',
     category: 'Hardscape',
     city: 'Redwood City',
@@ -63,6 +70,7 @@ const projects: Project[] = [
     image: 'https://diazconstructions.com/projects/BOCCE%20COURT/Bocce%20court/diaz-bocce8.webp',
   },
   {
+    slug: 'oak-street-adu',
     name: 'Oak Street ADU',
     category: 'ADU',
     city: 'Union City',
@@ -71,6 +79,7 @@ const projects: Project[] = [
     image: 'https://diazconstructions.com/projects/Garage/adu-interior.webp',
   },
   {
+    slug: 'rivera-home-addition',
     name: 'Rivera Home Addition',
     category: 'Additions',
     city: 'Palo Alto',
@@ -129,9 +138,10 @@ export default function ProjectsPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filtered.map((project) => {
               return (
-                <div
-                  key={project.name}
-                  className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-navy-950/5 group"
+                <Link
+                  key={project.slug}
+                  href={`/projects/${project.slug}`}
+                  className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-navy-950/5 group block"
                 >
                   {/* Project Image */}
                   <div className="relative h-56 w-full overflow-hidden">
@@ -154,7 +164,7 @@ export default function ProjectsPage() {
                       {project.description}
                     </p>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

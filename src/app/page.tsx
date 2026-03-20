@@ -194,7 +194,7 @@ export default function Home() {
           <p className="text-accent font-medium tracking-widest uppercase text-sm mb-6">
             Licensed General Contractor &middot; CSLB #989528
           </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-4xl">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-4xl">
             Your Trusted General Contractor in Redwood City{" "}
             <span className="text-accent">&amp; the Bay Area</span>
           </h1>
@@ -227,7 +227,7 @@ export default function Home() {
             <p className="text-accent font-medium tracking-widest uppercase text-sm mb-3">
               What We Do
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-navy-950">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-navy-950">
               Our Services
             </h2>
           </div>
@@ -265,7 +265,7 @@ export default function Home() {
             <p className="text-accent font-medium tracking-widest uppercase text-sm mb-3">
               Why Diaz Construction
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-navy-950">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-navy-950">
               Why Choose Us
             </h2>
           </div>
@@ -339,7 +339,7 @@ export default function Home() {
             <p className="text-accent font-medium tracking-widest uppercase text-sm mb-3">
               Where We Work
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-navy-950">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-navy-950">
               Proudly Serving the Bay Area
             </h2>
             <p className="mt-4 text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -361,6 +361,16 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href="/areas"
+              className="text-accent font-medium hover:text-accent-dark transition-colors inline-flex items-center gap-1 text-lg"
+            >
+              See all areas we serve
+              <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -371,7 +381,7 @@ export default function Home() {
             <p className="text-accent font-medium tracking-widest uppercase text-sm mb-3">
               Testimonials
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-navy-950">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-navy-950">
               What Our Clients Say
             </h2>
           </div>
@@ -408,7 +418,7 @@ export default function Home() {
       {/* ════════════ CTA ════════════ */}
       <section className="py-20 md:py-28 bg-navy-950">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Start Your Project?
           </h2>
           <p className="text-gray-300 text-lg mb-3 leading-relaxed">

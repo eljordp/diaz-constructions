@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, DM_Serif_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const dmSerif = DM_Serif_Display({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 
 export const metadata: Metadata = {
   title: "Diaz Construction | Licensed General Contractor | Redwood City & Bay Area",
@@ -20,6 +21,16 @@ export const metadata: Metadata = {
     "home additions Hayward",
     "licensed contractor Bay Area",
   ],
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "Diaz Construction | Licensed General Contractor | Bay Area",
+    description: "Licensed, bonded & insured general contractor serving Redwood City, Hayward & the Bay Area. CSLB #989528.",
+    images: ["/og-image.webp"],
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -29,7 +40,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-white text-navy-950`}>
+      <body className={`${inter.variable} ${dmSerif.variable} font-sans bg-white text-navy-950`}>
         <Navbar />
         <main>{children}</main>
         <Footer />

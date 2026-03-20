@@ -11,36 +11,42 @@ const services = [
   {
     icon: '⬡',
     title: 'Kitchen & Bathroom Remodels',
+    slug: 'kitchen-bath-remodel',
     description:
       'Complete kitchen and bathroom transformations. Custom cabinetry, countertops, tile work, plumbing, electrical, and fixtures. From design to final walkthrough, we handle every detail.',
   },
   {
     icon: '⌂',
     title: 'ADU Construction (Accessory Dwelling Units)',
+    slug: 'adu-construction',
     description:
       'Custom-built ADUs for rental income, multigenerational living, or home offices. We handle permits, design, and full construction. Compliant with all California ADU regulations.',
   },
   {
     icon: '⊞',
     title: 'Home Additions',
+    slug: 'home-additions',
     description:
       'Expand your living space with seamless additions that match your existing home. Extra bedrooms, expanded kitchens, second stories — built to integrate perfectly.',
   },
   {
     icon: '△',
     title: 'New Home Construction',
+    slug: 'new-construction',
     description:
       'Ground-up residential construction. From foundation to finish, we build custom homes with quality materials and expert craftsmanship.',
   },
   {
     icon: '▧',
     title: 'Hardscape & Landscape',
+    slug: 'hardscape-landscape',
     description:
       'Driveways, patios, retaining walls, irrigation systems, and outdoor living spaces. Transform your exterior with durable, beautiful hardscape solutions.',
   },
   {
     icon: '◎',
     title: 'Outdoor Living & Kitchens',
+    slug: 'outdoor-living',
     description:
       'Custom outdoor kitchens, BBQ islands, pergolas, and entertainment areas. Extend your living space outdoors with structures built to last.',
   },
@@ -88,10 +94,10 @@ export default function ServicesPage() {
 
                 {/* CTA Link */}
                 <Link
-                  href="/contact"
+                  href={`/services/${service.slug}`}
                   className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent-dark transition-colors"
                 >
-                  Get a Quote for This Service
+                  Learn More
                   <svg
                     className="w-4 h-4"
                     fill="none"

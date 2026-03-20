@@ -10,8 +10,8 @@
   --color-accent-light: #f09456;
   --color-accent-dark: #c96520;
   --color-slate-light: #f5f5f0;
-  --font-heading: 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-display), Georgia, serif;
 }
 
 html {
@@ -19,7 +19,10 @@ html {
 }
 
 body {
-  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.font-display {
+  font-family: var(--font-display);
 }
